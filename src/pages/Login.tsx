@@ -1,45 +1,76 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Container, TextField, Button, Paper, Typography, Box, Alert } from "@mui/material";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  interface LoginResponse {
+    access: string;
+    refresh: string;
+    error?: string;
+  }
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
-        username,
-        password,
+      const response = await fetch("http://localhost:8000/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       });
-      localStorage.setItem("access", response.data.access);
-      localStorage.setItem("refresh", response.data.refresh);
-      navigate("/dashboard");
-    } catch (error) {
-        console.log(error);
-      alert("Login failed");
+
+      const data: LoginResponse = await response.json();
+      if (response.ok) {
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("refreshToken", data.refresh);
+        console.log(localStorage.getItem("accessToken"));
+        console.log(localStorage.getItem("refreshToken"));
+        navigate("/dashboard");
+      } else {
+        setError(data.error || "Invalid credentials");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <input
-        type="text"
-        placeholder="Username"
-        className="border p-2 mb-2"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        className="border p-2 mb-2"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin} className="bg-blue-500 text-white p-2 rounded">
-        Login
-      </button>
-    </div>
+    <Container maxWidth="xs">
+      <Paper elevation={3} sx={{ p: 4, mt: 8, textAlign: "center" }}>
+        <Typography variant="h5" gutterBottom>
+          Login
+        </Typography>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Box component="form" onSubmit={handleLogin} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <TextField
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Login
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

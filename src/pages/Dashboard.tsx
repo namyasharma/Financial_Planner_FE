@@ -1,61 +1,88 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Function to refresh access token
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        throw new Error("Refresh token not found");
+      }
+
+      const response = await axios.post("http://127.0.0.1:8000/api/token/refresh/", {
+        refresh: refreshToken,
+      });
+
+      const newAccessToken = response.data.access;
+      localStorage.setItem("accessToken", newAccessToken);
+      console.log(localStorage.getItem("accessToken"));
+          console.log(localStorage.getItem("refreshToken"));
+
+      return newAccessToken;
+    } catch (err) {
+      console.error("Error refreshing token:", err);
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      setError("Session expired. Redirecting to login...");
+      setTimeout(() => navigate("/"), 2000);
+      return null;
+    }
+  };
+
+  // Function to fetch dashboard data
+  const fetchDashboardData = async (retry = true) => {
+    let token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      setError("Access token not found. Redirecting to login...");
+      setTimeout(() => navigate("/"), 2000);
+      return;
+    }
+
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const responses = await Promise.all([
+        axios.get("http://127.0.0.1:8000/spending-summary/", { headers }),
+        axios.get("http://127.0.0.1:8000/budget/", { headers }),
+        axios.get("http://127.0.0.1:8000/income/", { headers }),
+        axios.get("http://127.0.0.1:8000/expenses/", { headers }),
+        axios.get("http://127.0.0.1:8000/debts/", { headers }),
+        axios.get("http://127.0.0.1:8000/goals/", { headers }),
+      ]);
+
+      setDashboardData({
+        spendingSummary: responses[0].data,
+        budgets: responses[1].data,
+        incomes: responses[2].data,
+        expenses: responses[3].data,
+        debts: responses[4].data,
+        goals: responses[5].data,
+      });
+    } catch (err: any) {
+      if (err.response?.status === 401 && retry) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          return fetchDashboardData(false); // Retry once with new token
+        }
+      }
+      setError("Failed to load dashboard data. Please try again later.");
+      console.error("Error fetching data:", err);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('access');
-        if (!token) {
-          throw new Error('Token not found');
-        }
-
-        // Fetch spending summary (total, spent, remaining)
-        const spendingSummaryResponse = await axios.get(
-          'http://127.0.0.1:8000/spending-summary/',
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        // Fetch goals, budget, income, expenses, etc.
-        const budgetResponse = await axios.get('http://127.0.0.1:8000/budget/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const incomeResponse = await axios.get('http://127.0.0.1:8000/income/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const expenseResponse = await axios.get('http://127.0.0.1:8000/expenses/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const debtResponse = await axios.get('http://127.0.0.1:8000/debts/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setDashboardData({
-          spendingSummary: spendingSummaryResponse.data,
-          budgets: budgetResponse.data,
-          incomes: incomeResponse.data,
-          expenses: expenseResponse.data,
-          debts: debtResponse.data,
-        });
-      } catch (err: any) {
-        setError(`An error occurred while fetching dashboard data: ${err.message}`);
-        console.error('Error fetching data:', err);
-      }
-    };
-
-    fetchData();
+    fetchDashboardData();
   }, []);
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-red-500">{error}</div>;
   }
 
   if (!dashboardData) {
@@ -77,7 +104,7 @@ const Dashboard = () => {
       {/* Goals */}
       <div className="my-4">
         <h2>Your Financial Goals</h2>
-        {dashboardData.goals && dashboardData.goals.length > 0 ? (
+        {dashboardData.goals.length > 0 ? (
           <ul>
             {dashboardData.goals.map((goal: any) => (
               <li key={goal.id}>
@@ -93,7 +120,7 @@ const Dashboard = () => {
       {/* Budget Categories */}
       <div className="my-4">
         <h2>Your Budget Categories</h2>
-        {dashboardData.budgets && dashboardData.budgets.length > 0 ? (
+        {dashboardData.budgets.length > 0 ? (
           <ul>
             {dashboardData.budgets.map((budget: any) => (
               <li key={budget.id}>
@@ -109,7 +136,7 @@ const Dashboard = () => {
       {/* Expenses */}
       <div className="my-4">
         <h2>Your Expenses</h2>
-        {dashboardData.expenses && dashboardData.expenses.length > 0 ? (
+        {dashboardData.expenses.length > 0 ? (
           <ul>
             {dashboardData.expenses.map((expense: any) => (
               <li key={expense.id}>
@@ -125,7 +152,7 @@ const Dashboard = () => {
       {/* Debts */}
       <div className="my-4">
         <h2>Your Debts</h2>
-        {dashboardData.debts && dashboardData.debts.length > 0 ? (
+        {dashboardData.debts.length > 0 ? (
           <ul>
             {dashboardData.debts.map((debt: any) => (
               <li key={debt.id}>
