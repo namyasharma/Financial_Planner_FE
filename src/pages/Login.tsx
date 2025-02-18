@@ -2,38 +2,47 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Paper, Typography, Box, Alert } from "@mui/material";
 
-const Login = () => {
+const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLogin, setIsLogin] = useState(true); // Toggle between login and register
   const navigate = useNavigate();
 
-  interface LoginResponse {
+  interface AuthResponse {
     access: string;
     refresh: string;
     error?: string;
   }
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
+    const url = isLogin ? "http://localhost:8000/login/" : "http://localhost:8000/register/";
+    
     try {
-      const response = await fetch("http://localhost:8000/login/", {
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
-      const data: LoginResponse = await response.json();
+      const data: AuthResponse = await response.json();
       if (response.ok) {
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-        console.log(localStorage.getItem("accessToken"));
-        console.log(localStorage.getItem("refreshToken"));
-        navigate("/dashboard");
+        if (isLogin) {
+          localStorage.setItem("accessToken", data.access);
+          localStorage.setItem("refreshToken", data.refresh);
+          console.log(localStorage.getItem("accessToken"));
+          console.log(localStorage.getItem("refreshToken"));
+          navigate("/dashboard");
+        } else {
+          // Registration success, switch to login view or show a success message
+          setIsLogin(true);
+          setError("Registration successful! Please log in.");
+        }
       } else {
-        setError(data.error || "Invalid credentials");
+        setError(data.error || "Something went wrong");
       }
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -44,10 +53,10 @@ const Login = () => {
     <Container maxWidth="xs">
       <Paper elevation={3} sx={{ p: 4, mt: 8, textAlign: "center" }}>
         <Typography variant="h5" gutterBottom>
-          Login
+          {isLogin ? "Login" : "Register"}
         </Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        <Box component="form" onSubmit={handleLogin} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box component="form" onSubmit={handleAuth} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="Username"
             variant="outlined"
@@ -66,7 +75,18 @@ const Login = () => {
             required
           />
           <Button type="submit" variant="contained" color="primary" fullWidth>
-            Login
+            {isLogin ? "Login" : "Register"}
+          </Button>
+          <Button
+            variant="text"
+            fullWidth
+            onClick={() => {
+              setError(""); // Reset error message when toggling
+              setIsLogin(!isLogin); // Toggle form mode
+            }}
+            sx={{ mt: 2 }}
+          >
+            {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
           </Button>
         </Box>
       </Paper>
@@ -74,4 +94,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Auth;
