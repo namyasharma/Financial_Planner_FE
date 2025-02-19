@@ -62,3 +62,19 @@ img, .swiper-slide img {
   max-width: 100%;
   height: auto;
 }
+
+/* Style the next arrow button */
+.slick-prev,
+.slick-next {
+  display: block !important; /* Force visibility */
+  z-index: 1; 
+}
+
+.slick-prev {
+  left: 15px !important;
+}
+
+.slick-next {
+  right: 15px !important;
+}
+

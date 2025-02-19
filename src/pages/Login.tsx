@@ -39,15 +39,17 @@ const Login = () => {
   };
 
   const sliderSettings = {
-    dots: false,
+    dots: true,
     infinite: true,
     speed: 1000,
     autoplay: true,
     autoplaySpeed: 3000,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false,
+    arrows: true,
   };
+  
+  
 
   return (
     <Box sx={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
