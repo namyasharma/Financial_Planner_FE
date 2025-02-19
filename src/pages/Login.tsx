@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Paper, Typography, Box, Alert } from "@mui/material";
+import { TextField, Button, Typography, Box, Alert, Divider } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
 import Slider from "react-slick";
@@ -38,124 +38,111 @@ const Login = () => {
     }
   };
 
-  const settings = {
-    dots: true,
+  const sliderSettings = {
+    dots: false,
     infinite: true,
-    speed: 500,
+    speed: 1000,
     autoplay: true,
     autoplaySpeed: 3000,
     slidesToShow: 1,
     slidesToScroll: 1,
+    arrows: false,
   };
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      {/* Left side - Carousel */}
-      <Box
-        sx={{
-          width: "50%",
-          backgroundColor: "#f5f5f5",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          overflow: "hidden",
-        }}
-      >
-        <Box sx={{ width: "100%", maxWidth: "600px" }}>
-          <Slider {...settings}>
-            <Box component="img" src="https://via.placeholder.com/500x500?text=Image+1" alt="Carousel Image 1" sx={{ width: "100%" }} />
-            <Box component="img" src="https://via.placeholder.com/500x500?text=Image+2" alt="Carousel Image 2" sx={{ width: "100%" }} />
-            <Box component="img" src="https://via.placeholder.com/500x500?text=Image+3" alt="Carousel Image 3" sx={{ width: "100%" }} />
-          </Slider>
-        </Box>
+    <Box sx={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
+      {/* Left Side - Carousel */}
+      <Box sx={{ width: "50vw", height: "100vh", position: "relative" }}>
+        <Slider {...sliderSettings}>
+          {[
+            "https://img.freepik.com/free-photo/broker-looking-laptop-analyzing-stock-market-invest-trading-stocks-graph_169016-47428.jpg?t=st=1739973659~exp=1739977259~hmac=c0c6961e35690bfacd14b2c2afc8770c6d2f27b021aa2e7bfabab75c9e51ce9a&w=740",
+            "https://img.freepik.com/free-photo/forex-trading-workplace_1409-5578.jpg?t=st=1739973928~exp=1739977528~hmac=c923ef95dffa743de4fc8ac5f115f73eddf3dd620262060961fae2a0f59619b4&w=1380",
+            "https://img.freepik.com/free-photo/plant-growing-coins-glass-jar_155003-1174.jpg?t=st=1739974003~exp=1739977603~hmac=428d2a63c87697642ac9e9e3a67696becbba88f0d27f4956462700de646d56b0&w=740",
+          ].map((img, index) => (
+            <Box
+              key={index}
+              sx={{
+                height: "100vh",
+                backgroundImage: `url(${img})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+          ))}
+
+        </Slider>
       </Box>
 
-      {/* Right side - Login form */}
+      {/* Right Side - Login Form */}
       <Box
         sx={{
-          width: "50%",
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          width: "50vw",
+          height: "100vh",
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
-          alignItems: "center",
+          px: 6,
+          backgroundColor: "#fff",
+          boxShadow: "-10px 0 30px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Paper
-          elevation={8}
-          sx={{
-            padding: 3,
-            width: "80%",
-            maxWidth: 400,
-            backdropFilter: "blur(8px)",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
-            borderRadius: 4,
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-          <Typography variant="h5" align="center" sx={{ marginBottom: 2 }}>
-            Login to Your Account
-          </Typography>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          <Box
-            component="form"
-            onSubmit={handleLogin}
+        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+          Welcome Back
+        </Typography>
+        <Typography variant="body1" sx={{ color: "gray", mb: 4 }}>
+          Enter your credentials to access your account.
+        </Typography>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+        <Box component="form" onSubmit={handleLogin} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            InputProps={{
+              startAdornment: <PersonIcon sx={{ marginRight: 1 }} />,
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            InputProps={{
+              startAdornment: <LockIcon sx={{ marginRight: 1 }} />,
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              alignItems: "center",
+              padding: 1.5,
+              fontSize: 16,
+              borderRadius: 3,
+              backgroundColor: "#1e88e5",
+              "&:hover": { backgroundColor: "#1565c0" },
             }}
           >
-            <TextField
-              label="Username"
-              variant="outlined"
-              fullWidth
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              sx={{
-                marginBottom: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 5,
-                },
-              }}
-              InputProps={{
-                startAdornment: <PersonIcon sx={{ marginRight: 1 }} />,
-              }}
-            />
-            <TextField
-              label="Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              sx={{
-                marginBottom: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 5,
-                },
-              }}
-              InputProps={{
-                startAdornment: <LockIcon sx={{ marginRight: 1 }} />,
-              }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{
-                padding: 1.5,
-                fontSize: 16,
-                borderRadius: 5,
-              }}
-            >
-              Login
-            </Button>
-          </Box>
-        </Paper>
+            Sign In
+          </Button>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Typography variant="body2" sx={{ color: "gray" }}>
+          Don't have an account? <Button variant="text">Sign Up</Button>
+        </Typography>
       </Box>
     </Box>
   );
