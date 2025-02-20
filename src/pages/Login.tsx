@@ -168,7 +168,7 @@ const Login = () => {
         <Divider sx={{ my: 3 }} />
 
         <Typography variant="body2" sx={{ color: "gray" }}>
-          Don't have an account? <Button variant="text">Sign Up</Button>
+          Don't have an account? <Button variant="text" >Sign Up</Button>
         </Typography>
       </Box>
     </Box>
