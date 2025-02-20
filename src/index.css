@@ -87,24 +87,39 @@ img, .swiper-slide img {
   bottom: 20px !important; /* Push dots up */
   left: 50% !important;
   transform: translateX(-50%);
-  z-index: 1 !important; /* High priority */
+  z-index: 10 !important; /* Ensure on top */
+  padding: 0;
+  list-style: none;
 }
 
+/* Space out the dots */
 .slick-dots li {
   display: inline-block;
-  margin: 0 5px;
+  margin: 0 8px;
 }
 
+/* Style the buttons */
 .slick-dots li button {
-  font-size: 14px !important;
-  width: 15px !important;
-  height: 15px !important;
+  font-size: 0; /* Hide any unwanted text */
+  width: 1px;
+  height: 1px;
   border-radius: 50%;
-  background-color: #ccc !important;
+  background-color: #d3d3d3 !important; /* Inactive dot color */
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  outline: none; /* Remove any focus outlines */
+  padding: 0;
+  position: relative;
 }
 
+/* Remove the default Slick black dot */
+.slick-dots li button::before {
+  content: "" !important; /* Remove any default number/text */
+  display: none !important; /* Hide completely */
+}
+
+/* Active dot styling */
 .slick-dots li.slick-active button {
   background-color: #1e88e5 !important; /* Active dot color */
 }
