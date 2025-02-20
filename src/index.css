@@ -89,7 +89,7 @@ img, .swiper-slide img {
   transform: translateX(-50%);
   z-index: 1000;
   width: 100%;
-  height: 30px; /* Make it visible */
+  height: 30px;
 }
 
 
@@ -100,11 +100,11 @@ img, .swiper-slide img {
 
 /* Style the actual buttons as dots */
 .slick-dots li button {
-  width: 20px !important;
-  height: 3px !important;
+  width: 8px !important;
+  height: 8px !important;
   min-height: 0 !important;
   background-color: rgba(255, 255, 255, 0.397) !important;
-  border-radius: 3px;
+  border-radius: 50%;
   outline: none;
   cursor: pointer;
   line-height: 0 !important;
@@ -119,7 +119,5 @@ img, .swiper-slide img {
 /* Active dot styling */
 .slick-dots li.slick-active button {
   background-color: #ffffffd5 !important;
-  width: 30px !important;
-  height: 3px !important;
-  margin-right: 12px !important;
+  transform: scale(1.5);
 }

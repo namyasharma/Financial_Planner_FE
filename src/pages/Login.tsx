@@ -38,6 +38,31 @@ const Login = () => {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+  
+    try {
+      const response = await fetch("http://localhost:8000/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("refreshToken", data.refresh);
+        navigate("/dashboard");
+      } else {
+        setError(data.error || "Registration failed");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
+  };
+  
   const sliderSettings = {
     dots: true,
     infinite: true,
