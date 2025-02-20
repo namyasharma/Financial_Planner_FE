@@ -100,18 +100,26 @@ img, .swiper-slide img {
 
 /* Style the actual buttons as dots */
 .slick-dots li button {
-  width: 10px !important;
-  height: 10px !important;
+  width: 20px !important;
+  height: 3px !important;
+  min-height: 0 !important;
   background-color: rgba(255, 255, 255, 0.397) !important;
-  border-radius: 50%;
-  padding: 0;
-  margin: 0;
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  transition: width 0.3s ease, margin 0.3s ease, background-color 0.3s ease;
 }
-
 
 /* Active dot styling */
 .slick-dots li.slick-active button {
   background-color: #ffffffd5 !important;
+  width: 30px !important;
+  height: 3px !important;
+  margin-right: 12px !important;
 }
