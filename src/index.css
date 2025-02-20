@@ -78,48 +78,40 @@ img, .swiper-slide img {
   right: 15px !important;
 }
 
-/* Style the carousel dots */
+/* Ensure the dots container is positioned correctly */
 .slick-dots {
-  display: flex !important; /* Force visibility */
+  display: flex !important;
   justify-content: center;
   align-items: center;
-  position: absolute !important;
-  bottom: 20px !important; /* Push dots up */
-  left: 50% !important;
+  position: absolute;
+  bottom: 0px !important;
+  left: 50%;
   transform: translateX(-50%);
-  z-index: 10 !important; /* Ensure on top */
-  padding: 0;
-  list-style: none;
+  z-index: 1000;
+  width: 100%;
+  height: 30px; /* Make it visible */
 }
 
-/* Space out the dots */
-.slick-dots li {
-  display: inline-block;
-  margin: 0 8px;
-}
 
-/* Style the buttons */
-.slick-dots li button {
-  font-size: 0; /* Hide any unwanted text */
-  width: 1px;
-  height: 1px;
-  border-radius: 50%;
-  background-color: #d3d3d3 !important; /* Inactive dot color */
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  outline: none; /* Remove any focus outlines */
-  padding: 0;
-  position: relative;
-}
-
-/* Remove the default Slick black dot */
+/* Hide the default pseudo-dot */
 .slick-dots li button::before {
-  content: "" !important; /* Remove any default number/text */
-  display: none !important; /* Hide completely */
+  display: none !important;
 }
+
+/* Style the actual buttons as dots */
+.slick-dots li button {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: rgba(255, 255, 255, 0.397) !important;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+}
+
 
 /* Active dot styling */
 .slick-dots li.slick-active button {
-  background-color: #1e88e5 !important; /* Active dot color */
+  background-color: #ffffffd5 !important;
 }
