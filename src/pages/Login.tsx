@@ -12,9 +12,16 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  interface LoginResponse {
+    access: string;
+    refresh: string;
+    error?: string;
+  }
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError("");
 
@@ -25,7 +32,7 @@ const Login = () => {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
+      const data: LoginResponse = await response.json();
       if (response.ok) {
         localStorage.setItem("accessToken", data.access);
         localStorage.setItem("refreshToken", data.refresh);
@@ -38,19 +45,25 @@ const Login = () => {
     }
   };
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  interface RegisterResponse {
+    access: string;
+    refresh: string;
+    error?: string;
+  }
+
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError("");
-  
+ 
     try {
       const response = await fetch("http://localhost:8000/register/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-  
-      const data = await response.json();
-  
+
+      const data: RegisterResponse = await response.json();
+
       if (response.ok) {
         localStorage.setItem("accessToken", data.access);
         localStorage.setItem("refreshToken", data.refresh);
@@ -62,7 +75,7 @@ const Login = () => {
       setError("Something went wrong. Please try again.");
     }
   };
-  
+
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -73,8 +86,6 @@ const Login = () => {
     slidesToScroll: 1,
     arrows: true,
   };
-  
-  
 
   return (
     <Box sx={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
@@ -96,11 +107,10 @@ const Login = () => {
               }}
             />
           ))}
-
         </Slider>
       </Box>
 
-      {/* Right Side - Login Form */}
+      {/* Right Side - Form Panel */}
       <Box
         sx={{
           width: "50vw",
@@ -114,15 +124,19 @@ const Login = () => {
         }}
       >
         <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-          Welcome Back
+          {isRegistering ? "Create an Account" : "Welcome Back"}
         </Typography>
         <Typography variant="body1" sx={{ color: "gray", mb: 4 }}>
-          Enter your credentials to access your account.
+          {isRegistering ? "Sign up to get started with Financial Planner." : "Enter your credentials to access your account."}
         </Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-        <Box component="form" onSubmit={handleLogin} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box
+          component="form"
+          onSubmit={isRegistering ? handleRegister : handleLogin}
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
           <TextField
             label="Username"
             variant="outlined"
@@ -130,9 +144,7 @@ const Login = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            InputProps={{
-              startAdornment: <PersonIcon sx={{ marginRight: 1 }} />,
-            }}
+            InputProps={{ startAdornment: <PersonIcon sx={{ marginRight: 1 }} /> }}
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
           <TextField
@@ -143,9 +155,7 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            InputProps={{
-              startAdornment: <LockIcon sx={{ marginRight: 1 }} />,
-            }}
+            InputProps={{ startAdornment: <LockIcon sx={{ marginRight: 1 }} /> }}
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 3 } }}
           />
           <Button
@@ -161,14 +171,18 @@ const Login = () => {
               "&:hover": { backgroundColor: "#1565c0" },
             }}
           >
-            Sign In
+            {isRegistering ? "Sign Up" : "Sign In"}
           </Button>
         </Box>
 
         <Divider sx={{ my: 3 }} />
 
         <Typography variant="body2" sx={{ color: "gray" }}>
-          Don't have an account? <Button variant="text" >Sign Up</Button>
+          {isRegistering ? (
+            <>Already have an account? <Button variant="text" onClick={() => setIsRegistering(false)}>Sign In</Button></>
+          ) : (
+            <>Don't have an account? <Button variant="text" onClick={() => setIsRegistering(true)}>Sign Up</Button></>
+          )}
         </Typography>
       </Box>
     </Box>
