@@ -22,7 +22,7 @@
     "@nivo/core": "^0.88.0",
     "@nivo/geo": "^0.88.0",
     "@nivo/pie": "^0.88.0",
-    "@reduxjs/toolkit": "^2.5.1",
+    "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.7.9",
     "formik": "^2.4.6",
     "jwt-decode": "^4.0.0",

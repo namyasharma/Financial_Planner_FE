@@ -1,91 +1,25 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchDashboardData } from "../features/dashboard/dashboardSlice";
+import { RootState, AppDispatch } from "../store/store";
+import { Container, Typography, Card, CardContent, Grid, Alert, CircularProgress } from "@mui/material";
+
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { data: dashboardData, loading, error } = useSelector((state: RootState) => state.dashboard);
   const navigate = useNavigate();
 
-  // Function to refresh access token
-  const refreshAccessToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) {
-        throw new Error("Refresh token not found");
-      }
-
-      const response = await axios.post("http://127.0.0.1:8000/api/token/refresh/", {
-        refresh: refreshToken,
-      });
-
-      const newAccessToken = response.data.access;
-      localStorage.setItem("accessToken", newAccessToken);
-      console.log(localStorage.getItem("accessToken"));
-          console.log(localStorage.getItem("refreshToken"));
-
-      return newAccessToken;
-    } catch (err) {
-      console.error("Error refreshing token:", err);
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      setError("Session expired. Redirecting to login...");
-      setTimeout(() => navigate("/"), 2000);
-      return null;
-    }
-  };
-
-  // Function to fetch dashboard data
-  const fetchDashboardData = async (retry = true) => {
-    let token = localStorage.getItem("accessToken");
-
-    if (!token) {
-      setError("Access token not found. Redirecting to login...");
-      setTimeout(() => navigate("/"), 2000);
-      return;
-    }
-
-    try {
-      const headers = { Authorization: `Bearer ${token}` };
-
-      const responses = await Promise.all([
-        axios.get("http://127.0.0.1:8000/spending-summary/", { headers }),
-        axios.get("http://127.0.0.1:8000/budget/", { headers }),
-        axios.get("http://127.0.0.1:8000/income/", { headers }),
-        axios.get("http://127.0.0.1:8000/expenses/", { headers }),
-        axios.get("http://127.0.0.1:8000/debts/", { headers }),
-        axios.get("http://127.0.0.1:8000/goals/", { headers }),
-      ]);
-
-      setDashboardData({
-        spendingSummary: responses[0].data,
-        budgets: responses[1].data,
-        incomes: responses[2].data,
-        expenses: responses[3].data,
-        debts: responses[4].data,
-        goals: responses[5].data,
-      });
-    } catch (err: any) {
-      if (err.response?.status === 401 && retry) {
-        const newToken = await refreshAccessToken();
-        if (newToken) {
-          return fetchDashboardData(false); // Retry once with new token
-        }
-      }
-      setError("Failed to load dashboard data. Please try again later.");
-      console.error("Error fetching data:", err);
-    }
-  };
-
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    dispatch(fetchDashboardData());
+  }, [dispatch]);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
 
-  if (!dashboardData) {
+  if (loading || !dashboardData) {
     return <div>Loading...</div>;
   }
 
