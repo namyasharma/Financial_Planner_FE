@@ -18,8 +18,10 @@ export const fetchDashboardData = createAsyncThunk(
   'dashboard/fetchDashboardData',
   async (_, { rejectWithValue }) => {
     try {
+      console.log("🔄 fetchDashboardData started...");
       const token = localStorage.getItem("accessToken");
       const headers = { Authorization: `Bearer ${token}` };
+      console.log("Fetching dashboard data with token:", token);
 
       const responses = await Promise.all([
         axios.get("http://127.0.0.1:8000/spending-summary/", { headers }),
@@ -29,7 +31,7 @@ export const fetchDashboardData = createAsyncThunk(
         axios.get("http://127.0.0.1:8000/debts/", { headers }),
         axios.get("http://127.0.0.1:8000/goals/", { headers }),
       ]);
-
+      console.log("API Responses:", responses.map(res => res.data));
       return {
         spendingSummary: responses[0].data,
         budgets: responses[1].data,
